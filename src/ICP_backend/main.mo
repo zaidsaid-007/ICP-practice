@@ -1,39 +1,37 @@
-// Define the Auction actor, which represents a simple auction system
 actor Auction {
-  // Map of bids for each item
-  var bids : HashMap<Text, Nat> = HashMap<Text, Nat>();
-
-  // Start a new auction for an item
-  public shared async function startAuction(item : Text) {
-    // Initialize the bid for the item to 0
-    bids[item] := 0;
+  type Item = {
+    id : Nat;
+    name : Text;
+    description : Text;
+    currentBid : Nat;
   };
 
-  // Place a bid for an item
-  public shared async function placeBid(item : Text, amount : Nat) : async Bool {
-    // Check if the bid is higher than the current highest bid
-    let currentBid = switch (bids.get(item)) {
-      | null => 0
-      | some(bid) => bid
-    };
+  var items : [Item] = [];
 
-    if (amount <= currentBid) {
-      return false; // Bid is too low, place bid failed
+  // public shared func addItem(name :Text, description: Text , initialBid : Nat) {
+  //   items := items ++ [{id =Array.length(items) + 1  name = name }]
+  // }
+
+
+  public shared func addItem(name : Text, description : Text, initialBid : Nat) {
+    items := items ++ [{ id = Array.length(items) + 1  name := name description := description currentBid := initialBid }];
+  };
+
+  public shared func placeBid(itemId : Nat, amount : Nat) : Bool {
+    if (itemId < 1 | itemId > Array.length(items)) {
+      Debug.print ("Invalid item id"); // Invalid item id
     }
 
-    // Update the bid for the item
-    bids[item] := amount;
+    let item = items[itemId - 1];
+    if (amount <= item.currentBid) {
+      Debug.print("Bid is too low"); // Bid is too low
+    }
 
-    // Bid placed successfully
+    items := Array.update(items, itemId - 1, { item with currentBid = amount });
     return true;
   };
 
-  // Get the current highest bid for an item
-  public query async function getHighestBid(item : Text) : async Nat {
-    // Retrieve the current highest bid for the item from the 'bids' map
-    switch (bids.get(item)) {
-      | null => 0 // Return 0 if there are no bids for the item
-      | some(bid) => bid // Return the current highest bid for the item
-    };
+  public query func getItems() : [Item] {
+    items;
   };
 };
