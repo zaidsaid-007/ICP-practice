@@ -1,0 +1,27 @@
+Motoko is a programming language designed for smart contracts on the Internet Computer
+4
+. To make an API call in Motoko, you can use the Http.request function, which sends an HTTP request to a specified URL and returns the response as a HttpResponse object
+3
+. Here's an example of how you can make an API call in Motoko:
+
+import Http "mo:base/Http";
+
+public shared func fetch_data() : async Text {
+  let response = await Http.request({
+    url = "https://your-api-url",
+    method = Http.Method.GET,
+    headers = [],
+    body = null
+  });
+
+  if (response.status_code == Http.Status.OK) {
+    return response.body_text();
+  } else {
+    return "Error: " # Int.to_text(response.status_code);
+  }
+}
+
+
+
+
+This code imports the Http module and defines a fetch_data function that sends an HTTP GET request to a specified URL and returns the response as a Text object. You can modify the code according to your specific requirements and the structure of your API.
